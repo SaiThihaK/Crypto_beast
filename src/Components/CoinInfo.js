@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { HistoricalChart } from "../Config/api";
 import { CryptoState } from "../CryptoContent";
 import axios from "axios";
-// eslint-disable-next-line
 import { Chart as ChartJS } from "chart.js/auto";
 
 import { chartDays } from "../Config/data";

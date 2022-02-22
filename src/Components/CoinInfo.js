@@ -4,32 +4,67 @@ import {
   CircularProgress,
   Container,
   makeStyles,
+  LinearProgress,
 } from "@material-ui/core";
 import { Line } from "react-chartjs-2";
 import { useEffect, useState } from "react";
 import { HistoricalChart } from "../Config/api";
 import { CryptoState } from "../CryptoContent";
 import axios from "axios";
+import { Chart as ChartJS } from "chart.js/auto";
 
 const CoinInfo = ({ coin }) => {
-  const { currency, symbol } = CryptoState();
+  const { currency } = CryptoState();
   // useState
-  const [historicalChartData, setHistoricalChartData] = useState([]);
+  const [historicData, setHistoricData] = useState();
   const [days, setDays] = useState(1);
-  const [counter, setCounter] = useState(0);
-  const fetchHistoricalData = async () => {
-    const { data } = await axios.get(HistoricalChart(coin.id, days, currency));
-    setHistoricalChartData(data.prices);
-  };
+  const [flag, setflag] = useState(false);
   useEffect(() => {
-    fetchHistoricalData();
+    fetchHistoricData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [days]);
+
+  const fetchHistoricData = async () => {
+    const { data } = await axios.get(HistoricalChart(coin.id, days, currency));
+    setflag(true);
+    setHistoricData(data.prices);
+  };
+
+  const data = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    datasets: [
+      {
+        label: "First dataset",
+        data: [33, 53, 85, 41, 44, 65],
+        fill: true,
+        backgroundColor: "rgba(75,192,192,0.2)",
+        borderColor: "rgba(75,192,192,1)",
+      },
+      {
+        label: "Second dataset",
+        data: [33, 25, 35, 51, 54, 76],
+        fill: false,
+        borderColor: "#742774",
+      },
+    ],
+  };
+  console.log(coin.id);
+  console.log(data);
+  console.log({ historicData });
   const classes = useStyles();
-  console.log(historicalChartData);
   return (
     <ThemeProvider theme={darkTheme}>
-      <div className={classes.container}>{/* <Line /> */}</div>
+      <div className={classes.container}>
+        {!historicData ? (
+          <Line data={data} />
+        ) : (
+          <CircularProgress
+            style={{ color: "gold" }}
+            size={250}
+            thickness={1}
+          />
+        )}
+      </div>
     </ThemeProvider>
   );
 };

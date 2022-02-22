@@ -12,11 +12,13 @@ import { HistoricalChart } from "../Config/api";
 import { CryptoState } from "../CryptoContent";
 import axios from "axios";
 import { Chart as ChartJS } from "chart.js/auto";
+import { chartDays } from "../Config/data";
+import SelectButton from "./SelectButton";
 
 const CoinInfo = ({ coin }) => {
   const { currency } = CryptoState();
   // useState
-  const [historicData, setHistoricData] = useState();
+  const [historicData, setHistoricData] = useState([]);
   const [days, setDays] = useState(1);
   const [flag, setflag] = useState(false);
   useEffect(() => {
@@ -29,46 +31,62 @@ const CoinInfo = ({ coin }) => {
     setflag(true);
     setHistoricData(data.prices);
   };
-  // This is the dummy data for chart to test it out what is the real problem
-  // what I tryinf to do is
-  // const data ={
-  //   labels:historicData.map((coin)=>{
-  //   let date = new Date(coin[0]);
-  //   let time = date.getHours()>12 ?
-  //   `${date.getHours()-12}:${date.getMinutes()}PM`:
-  //   `${date.getHours()}:${date.getMinutes()}AM`;
-  //   return days===1 ? time : date.toLocaleDateString();
-  // })
-  // }
   const data = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: historicData.map((coin) => {
+      let date = new Date(coin[0]);
+      let time =
+        date.getHours() > 12
+          ? `${date.getHours() - 12}:${date.getMinutes()}PM`
+          : `${date.getHours()}:${date.getMinutes()}AM`;
+      return days === 1 ? time : date.toLocaleDateString();
+    }),
     datasets: [
       {
-        label: "First dataset",
-        data: [33, 53, 85, 41, 44, 65],
-        fill: true,
-        backgroundColor: "rgba(75,192,192,0.2)",
-        borderColor: "rgba(75,192,192,1)",
-      },
-      {
-        label: "Second dataset",
-        data: [33, 25, 35, 51, 54, 76],
-        fill: false,
-        borderColor: "#742774",
+        data: historicData.map((coin) => coin[1]),
+        label: `Price ( Past ${days} Days ) in ${currency}`,
+        borderColor: "#EEBC1D",
       },
     ],
   };
 
-  console.log(coin.id);
-  console.log(data);
-  // I can console.log historicData but I get error when I map the historic data
-  console.log({ historicData });
   const classes = useStyles();
   return (
     <ThemeProvider theme={darkTheme}>
       <div className={classes.container}>
-        {historicData ? (
-          <Line data={data} />
+        {historicData | (flag === true) ? (
+          <>
+            <Line
+              data={data}
+              options={{
+                elements: {
+                  point: {
+                    radius: 1,
+                  },
+                },
+              }}
+            />
+            <div
+              style={{
+                display: "flex",
+                marginTop: 20,
+                justifyContent: "space-around",
+                width: "100%",
+              }}
+            >
+              {chartDays?.map((day) => (
+                <SelectButton
+                  key={day.value}
+                  onClick={() => {
+                    setDays(day.value);
+                    setflag(false);
+                  }}
+                  selected={day.value === days}
+                >
+                  {day.label}
+                </SelectButton>
+              ))}
+            </div>
+          </>
         ) : (
           <CircularProgress
             style={{ color: "gold" }}

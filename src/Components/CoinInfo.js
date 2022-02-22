@@ -29,7 +29,17 @@ const CoinInfo = ({ coin }) => {
     setflag(true);
     setHistoricData(data.prices);
   };
-
+  // This is the dummy data for chart to test it out what is the real problem
+  // what I tryinf to do is
+  // const data ={
+  //   labels:historicData.map((coin)=>{
+  //   let date = new Date(coin[0]);
+  //   let time = date.getHours()>12 ?
+  //   `${date.getHours()-12}:${date.getMinutes()}PM`:
+  //   `${date.getHours()}:${date.getMinutes()}AM`;
+  //   return days===1 ? time : date.toLocaleDateString();
+  // })
+  // }
   const data = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
     datasets: [
@@ -48,14 +58,16 @@ const CoinInfo = ({ coin }) => {
       },
     ],
   };
+
   console.log(coin.id);
   console.log(data);
+  // I can console.log historicData but I get error when I map the historic data
   console.log({ historicData });
   const classes = useStyles();
   return (
     <ThemeProvider theme={darkTheme}>
       <div className={classes.container}>
-        {!historicData ? (
+        {historicData ? (
           <Line data={data} />
         ) : (
           <CircularProgress
